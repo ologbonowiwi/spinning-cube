@@ -2,7 +2,7 @@
 
 Hey, this is my spinning cube project!
 
-I did this project just for fun, and this is the cube looks:
+I did this project just for fun, and this is how the cube looks like:
 
 ![spinning cube](static/spinning-cube.gif)
 
