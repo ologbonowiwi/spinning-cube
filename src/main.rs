@@ -17,11 +17,15 @@ struct CalculationParams<'a> {
 }
 
 fn calculate_x(data: &CalculationParams) -> f64 {
-    f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.cos() - f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.cos() + f64::from(*data.y) * data.a.cos() * data.c.sin() + f64::from(*data.z) * data.a.sin() * data.c.sin() + f64::from(*data.x) * data.b.cos() * data.c.cos()
+    f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.cos() - f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.cos()
+    + f64::from(*data.y) * data.a.cos() * data.c.sin() + f64::from(*data.z) * data.a.sin() * data.c.sin()
+    + f64::from(*data.x) * data.b.cos() * data.c.cos()
 }
 
 fn calculate_y(data: &CalculationParams) -> f64 {
-    f64::from(*data.y) * data.a.cos() * data.c.cos() + f64::from(*data.z) * data.a.sin() * data.c.cos() - f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.sin() + f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.sin() - f64::from(*data.x) * data.b.cos() * data.c.sin()
+    f64::from(*data.y) * data.a.cos() * data.c.cos()
+    + f64::from(*data.z) * data.a.sin() * data.c.cos() - f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.sin()
+    + f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.sin() - f64::from(*data.x) * data.b.cos() * data.c.sin()
 }
 
 fn calculate_z(data: &CalculationParams) -> f64 {
