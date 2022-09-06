@@ -1,6 +1,6 @@
 use std::{thread::sleep, time::Duration};
 
-use libc::{putchar};
+use libc::putchar;
 
 const CUBE_WIDTH: f32 = 20.0;
 const WIDTH: f64 = 160.0;
@@ -13,26 +13,37 @@ struct CalculationParams<'a> {
     z: &'a f32,
     a: &'a f64,
     b: &'a f64,
-    c: &'a f64
+    c: &'a f64,
 }
 
 fn calculate_x(data: &CalculationParams) -> f64 {
-    f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.cos() - f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.cos()
-    + f64::from(*data.y) * data.a.cos() * data.c.sin() + f64::from(*data.z) * data.a.sin() * data.c.sin()
-    + f64::from(*data.x) * data.b.cos() * data.c.cos()
+    f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.cos()
+        - f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.cos()
+        + f64::from(*data.y) * data.a.cos() * data.c.sin()
+        + f64::from(*data.z) * data.a.sin() * data.c.sin()
+        + f64::from(*data.x) * data.b.cos() * data.c.cos()
 }
 
 fn calculate_y(data: &CalculationParams) -> f64 {
     f64::from(*data.y) * data.a.cos() * data.c.cos()
-    + f64::from(*data.z) * data.a.sin() * data.c.cos() - f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.sin()
-    + f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.sin() - f64::from(*data.x) * data.b.cos() * data.c.sin()
+        + f64::from(*data.z) * data.a.sin() * data.c.cos()
+        - f64::from(*data.y) * data.a.sin() * data.b.sin() * data.c.sin()
+        + f64::from(*data.z) * data.a.cos() * data.b.sin() * data.c.sin()
+        - f64::from(*data.x) * data.b.cos() * data.c.sin()
 }
 
 fn calculate_z(data: &CalculationParams) -> f64 {
-    f64::from(*data.z) * data.a.cos() * data.b.cos() - f64::from(*data.y) * data.a.sin() * data.b.cos() + f64::from(*data.x) * data.b.sin()
+    f64::from(*data.z) * data.a.cos() * data.b.cos()
+        - f64::from(*data.y) * data.a.sin() * data.b.cos()
+        + f64::from(*data.x) * data.b.sin()
 }
 
-fn calculate_for_surface(data: CalculationParams, ascii_char: i32, z_buffer: &mut [f64], buffer: &mut [i32]) {
+fn calculate_for_surface(
+    data: CalculationParams,
+    ascii_char: i32,
+    z_buffer: &mut [f64],
+    buffer: &mut [i32],
+) {
     const K1: f64 = 40.0;
     const DISTANCE_FROM_CAM: i32 = 100;
 
@@ -63,10 +74,10 @@ fn main() {
     let c: f64 = 0.0;
 
     loop {
-        let mut buffer = vec![BACKGROUND_ASCII_CODE; (WIDTH*HEIGHT) as usize];
-        let mut z_buffer = vec![0 as f64; (WIDTH*HEIGHT*4f64) as usize];
+        let mut buffer = vec![BACKGROUND_ASCII_CODE; (WIDTH * HEIGHT) as usize];
+        let mut z_buffer = vec![0 as f64; (WIDTH * HEIGHT * 4f64) as usize];
         let mut cube_x = -CUBE_WIDTH;
-        
+
         while cube_x < CUBE_WIDTH {
             cube_x += INCREMENT_SPEED;
 
@@ -75,19 +86,95 @@ fn main() {
             while cube_y < CUBE_WIDTH {
                 cube_y += INCREMENT_SPEED;
 
-                calculate_for_surface(CalculationParams{ x: &cube_x, y: &cube_y, z: &-CUBE_WIDTH, a: &a, b: &b, c: &c }, 33, &mut z_buffer, &mut buffer);
-                calculate_for_surface(CalculationParams{ x: &CUBE_WIDTH, y: &cube_y, z: &cube_x, a: &a, b: &b, c: &c }, 36, &mut z_buffer, &mut buffer);
-                calculate_for_surface(CalculationParams{ x: &-CUBE_WIDTH, y: &cube_y, z: &-cube_x, a: &a, b: &b, c: &c }, 126, &mut z_buffer, &mut buffer);
-                calculate_for_surface(CalculationParams{ x: &-cube_x, y: &cube_y, z: &CUBE_WIDTH, a: &a, b: &b, c: &c }, 35, &mut z_buffer, &mut buffer);
-                calculate_for_surface(CalculationParams{ x: &cube_x, y: &-CUBE_WIDTH, z: &-cube_y, a: &a, b: &b, c: &c }, 38, &mut z_buffer, &mut buffer);
-                calculate_for_surface(CalculationParams{ x: &cube_x, y: &CUBE_WIDTH, z: &cube_y, a: &a, b: &b, c: &c }, 43, &mut z_buffer, &mut buffer);
+                calculate_for_surface(
+                    CalculationParams {
+                        x: &cube_x,
+                        y: &cube_y,
+                        z: &-CUBE_WIDTH,
+                        a: &a,
+                        b: &b,
+                        c: &c,
+                    },
+                    33,
+                    &mut z_buffer,
+                    &mut buffer,
+                );
+                calculate_for_surface(
+                    CalculationParams {
+                        x: &CUBE_WIDTH,
+                        y: &cube_y,
+                        z: &cube_x,
+                        a: &a,
+                        b: &b,
+                        c: &c,
+                    },
+                    36,
+                    &mut z_buffer,
+                    &mut buffer,
+                );
+                calculate_for_surface(
+                    CalculationParams {
+                        x: &-CUBE_WIDTH,
+                        y: &cube_y,
+                        z: &-cube_x,
+                        a: &a,
+                        b: &b,
+                        c: &c,
+                    },
+                    126,
+                    &mut z_buffer,
+                    &mut buffer,
+                );
+                calculate_for_surface(
+                    CalculationParams {
+                        x: &-cube_x,
+                        y: &cube_y,
+                        z: &CUBE_WIDTH,
+                        a: &a,
+                        b: &b,
+                        c: &c,
+                    },
+                    35,
+                    &mut z_buffer,
+                    &mut buffer,
+                );
+                calculate_for_surface(
+                    CalculationParams {
+                        x: &cube_x,
+                        y: &-CUBE_WIDTH,
+                        z: &-cube_y,
+                        a: &a,
+                        b: &b,
+                        c: &c,
+                    },
+                    38,
+                    &mut z_buffer,
+                    &mut buffer,
+                );
+                calculate_for_surface(
+                    CalculationParams {
+                        x: &cube_x,
+                        y: &CUBE_WIDTH,
+                        z: &cube_y,
+                        a: &a,
+                        b: &b,
+                        c: &c,
+                    },
+                    43,
+                    &mut z_buffer,
+                    &mut buffer,
+                );
             }
         }
 
         println!("\x1b[H");
         for k in 0..=WIDTH as i32 * HEIGHT as i32 {
             unsafe {
-                putchar(if k % WIDTH as i32 != 0 { buffer[k as usize] } else { 10 });
+                putchar(if k % WIDTH as i32 != 0 {
+                    buffer[k as usize]
+                } else {
+                    10
+                });
             }
         }
 
