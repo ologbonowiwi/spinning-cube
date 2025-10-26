@@ -1,0 +1,86 @@
+const CUBE_WIDTH = 20.0;
+const WIDTH = 160;
+const HEIGHT = 44;
+const BACKGROUND_ASCII_CODE = 32; // space character code
+
+function calculateX(x, y, z, a, b, c) {
+    return y * Math.sin(a) * Math.sin(b) * Math.cos(c)
+        - z * Math.cos(a) * Math.sin(b) * Math.cos(c)
+        + y * Math.cos(a) * Math.sin(c)
+        + z * Math.sin(a) * Math.sin(c)
+        + x * Math.cos(b) * Math.cos(c);
+}
+
+function calculateY(x, y, z, a, b, c) {
+    return y * Math.cos(a) * Math.cos(c)
+        + z * Math.sin(a) * Math.cos(c)
+        - y * Math.sin(a) * Math.sin(b) * Math.sin(c)
+        + z * Math.cos(a) * Math.sin(b) * Math.sin(c)
+        - x * Math.cos(b) * Math.sin(c);
+}
+
+function calculateZ(x, y, z, a, b, c) {
+    return z * Math.cos(a) * Math.cos(b)
+        - y * Math.sin(a) * Math.cos(b)
+        + x * Math.sin(b);
+}
+
+function calculateForSurface(x, y, z, a, b, c, asciiChar, zBuffer, buffer) {
+    const K1 = 40;
+    const DISTANCE_FROM_CAM = 100;
+
+    const calculatedX = calculateX(x, y, z, a, b, c);
+    const calculatedY = calculateY(x, y, z, a, b, c);
+    const calculatedZ = calculateZ(x, y, z, a, b, c) + DISTANCE_FROM_CAM;
+
+    const ooz = 1 / calculatedZ;
+
+    const xp = Math.floor(WIDTH / 2 - 2 * CUBE_WIDTH + K1 * ooz * calculatedX * 2);
+    const yp = Math.floor(HEIGHT / 2 + K1 * ooz * calculatedY);
+
+    const idx = xp + yp * WIDTH;
+
+    if (idx >= 0 && idx < WIDTH * HEIGHT && ooz > zBuffer[idx]) {
+        zBuffer[idx] = ooz;
+        buffer[idx] = asciiChar;
+    }
+}
+
+function render() {
+    const INCREMENT_SPEED = 0.6;
+    let a = 0;
+    let b = 0;
+    const c = 0;
+    const cubeElement = document.getElementById('cube');
+
+    function animate() {
+        const buffer = new Array(WIDTH * HEIGHT).fill(BACKGROUND_ASCII_CODE);
+        const zBuffer = new Array(WIDTH * HEIGHT * 4).fill(0);
+        
+        for (let cubeX = -CUBE_WIDTH; cubeX < CUBE_WIDTH; cubeX += INCREMENT_SPEED) {
+            for (let cubeY = -CUBE_WIDTH; cubeY < CUBE_WIDTH; cubeY += INCREMENT_SPEED) {
+                calculateForSurface(cubeX, cubeY, -CUBE_WIDTH, a, b, c, '!'.charCodeAt(0), zBuffer, buffer);
+                calculateForSurface(CUBE_WIDTH, cubeY, cubeX, a, b, c, '$'.charCodeAt(0), zBuffer, buffer);
+                calculateForSurface(-CUBE_WIDTH, cubeY, -cubeX, a, b, c, '~'.charCodeAt(0), zBuffer, buffer);
+                calculateForSurface(-cubeX, cubeY, CUBE_WIDTH, a, b, c, '#'.charCodeAt(0), zBuffer, buffer);
+                calculateForSurface(cubeX, -CUBE_WIDTH, -cubeY, a, b, c, '&'.charCodeAt(0), zBuffer, buffer);
+                calculateForSurface(cubeX, CUBE_WIDTH, cubeY, a, b, c, '+'.charCodeAt(0), zBuffer, buffer);
+            }
+        }
+
+        let output = '';
+        for (let k = 0; k < WIDTH * HEIGHT; k++) {
+            output += k % WIDTH ? String.fromCharCode(buffer[k]) : '\n';
+        }
+        cubeElement.textContent = output;
+
+        a += 0.05;
+        b += 0.05;
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
+}
+
+window.onload = render;
